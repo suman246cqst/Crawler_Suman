@@ -26,13 +26,11 @@ The responsibility of the **PageStorage** component is to permanently store ever
 ```cpp
 class PageStorage {
 public:
-    void storePage(std::string url,
-                   std::string html,
-                   int depth);
+    void storePage(string url,std::string html,int depth);
 
-    std::string getPage(std::string url);
+    std::string getPage(string url);
 
-    bool hasPage(std::string url);
+    bool hasPage(string url);
 
     int pageCount();
 };
