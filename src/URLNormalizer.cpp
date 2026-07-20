@@ -42,3 +42,28 @@ bool URLNormalizer::startsWith(const string& str,const string& prefix){
 
     return true;
 }
+
+bool URLNormalizer::isAbsoluteURL(const string& url){
+    return startsWith(url, "http://") || startsWith(url, "https://");
+}
+
+
+bool URLNormalizer::isProtocolRelative(const string& url){
+    return startsWith(url, "//");
+}
+
+
+bool URLNormalizer::isRootRelative(const string& url){
+    return !isProtocolRelative(url) && !url.empty() && url[0] == '/';
+}
+
+
+bool URLNormalizer::isInvalidScheme(
+    const string& url)
+{
+    return startsWith(url, "mailto:")     ||
+           startsWith(url, "javascript:") ||
+           startsWith(url, "tel:")        ||
+           startsWith(url, "ftp:")        ||
+           startsWith(url, "data:");
+}
