@@ -120,3 +120,48 @@ string URLNormalizer::removeTrailingSlash(const string& url){
     }
     return url;
 }
+
+string URLNormalizer::getScheme(const string& url)
+{
+    int schemeEnd = url.find("://");
+    if(schemeEnd == string::npos){
+        return "";
+    }
+
+    return url.substr(0,schemeEnd + 3);
+}
+
+
+string URLNormalizer::getHost(const string& url){
+    int schemeEnd = url.find("://");
+    if(schemeEnd == string::npos){
+        return "";
+    }
+    int hostStart = schemeEnd + 3;
+    int hostEnd =url.find('/', hostStart);
+    if(hostEnd == string::npos){
+        return url.substr(hostStart);
+    }
+    return url.substr(hostStart,hostEnd - hostStart);
+}
+
+
+string URLNormalizer::getDirectory(const string& baseURL){
+    int schemeEnd =baseURL.find("://");
+    if(schemeEnd == string::npos){
+        return "";
+    }
+    int hostStart = schemeEnd + 3;
+    int pathStart =baseURL.find('/', hostStart);
+    // No path
+    if(pathStart == string::npos){
+        return baseURL + "/";
+    }
+
+    int lastSlash =baseURL.rfind('/');
+
+    if(lastSlash < pathStart){
+        return baseURL + "/";
+    }
+    return baseURL.substr(0,lastSlash + 1);
+}
