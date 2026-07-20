@@ -251,3 +251,30 @@ string URLNormalizer::resolveDotSegments(const string& url){
     }
     return result;
 }
+
+string URLNormalizer::resolveRelativeURL(const string& baseURL,const string& relativeURL)
+{
+    //--------------------------------------------------
+    // Protocol-relative
+    //--------------------------------------------------
+
+    if(isProtocolRelative(relativeURL))
+    {
+        return getScheme(baseURL) + relativeURL.substr(2);
+    }
+
+    //--------------------------------------------------
+    // Root-relative
+    //--------------------------------------------------
+
+    if(isRootRelative(relativeURL)){
+        return getScheme(baseURL) + getHost(baseURL) + relativeURL;
+    }
+
+    //--------------------------------------------------
+    // Normal relative
+    //--------------------------------------------------
+
+    return getDirectory(baseURL) + relativeURL;
+}
+
