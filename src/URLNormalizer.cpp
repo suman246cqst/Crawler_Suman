@@ -193,3 +193,61 @@ string URLNormalizer::toLowerSchemeAndHost(const string& url){
     }
     return result;
 }
+
+string URLNormalizer::resolveDotSegments(const string& url){
+    int schemeEnd = url.find("://");
+    if(schemeEnd == string::npos){
+        return url;
+    }
+
+    int pathStart = url.find('/', schemeEnd + 3);
+
+    if(pathStart == string::npos)
+    {
+        return url;
+    }
+
+    string prefix = url.substr(0, pathStart);
+    string path = url.substr(pathStart);
+
+    bool trailingSlash =!path.empty() && path.back() == '/';
+
+    DynamicArray<string> segments;
+
+    int i = 1;
+
+    while(i <= path.length()){
+        string segment;
+        while(i < path.length() && path[i] != '/'){
+            segment += path[i];
+            i++;
+        }
+        if(segment.empty() || segment == ".")
+        {
+            // Ignore
+        }
+        else if(segment == ".."){
+            if(!segments.isEmpty()){
+                segments.pop_back();
+            }
+        }
+        else{
+            segments.push_back(segment);
+        }
+        i++;
+    }
+    string result = prefix;
+    if(segments.isEmpty()){
+        return result + "/";
+    }
+
+    for(int j = 0;j < segments.getSize();j++){
+        result += "/";
+        result += segments[j];
+    }
+
+    if(trailingSlash){
+        result += "/";
+    }
+    return result;
+}
