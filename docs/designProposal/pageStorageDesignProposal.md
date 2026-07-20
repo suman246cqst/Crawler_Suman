@@ -1,375 +1,404 @@
 # PageStorage Design Proposal
 
 > **Component:** PageStorage
-> **Project:** SuperCoders – Project 02: Web Crawler
+> **Project:** Web Crawler
 
 ---
 
 # Overview
 
-The **PageStorage** component is responsible for the persistent storage of all successfully crawled web pages during a crawl session. It serves as the storage layer of the crawler by recording the URL, crawl depth, and corresponding HTML content of each downloaded page. The stored pages are intended to be consumed by later stages of the project, particularly the Indexer introduced in Project 03.
+The **PageStorage** component is responsible for persistently storing every successfully crawled web page so that it can later be consumed by the **Indexer** (Project 03).
 
-The current implementation uses a **single structured text file** as the storage medium. This approach was selected because it is simple to implement, requires no external database dependency, and allows the stored data to be inspected manually during development and debugging. Each stored page is represented as a separate record containing the URL, crawl depth, HTML content, and a custom page delimiter that separates consecutive page records.
+Each crawled page is stored as an individual file, while a separate **index file** maintains the mapping between URLs and their corresponding page files.
 
-PageStorage has a clearly defined responsibility within the crawler architecture. It is responsible only for storing and retrieving crawled pages. It does not perform duplicate URL detection, HTML parsing, URL validation, or page downloading. Duplicate detection is handled entirely by the **Seen URL Store** before a page reaches the storage component.
-
-Although the current implementation is file-based, the public interface is intentionally designed to remain independent of the underlying storage mechanism. In future versions of the crawler, the structured text file can be replaced by a database such as MongoDB without requiring changes to the crawler or any other component that interacts with the PageStorage interface. This design promotes low coupling, maintainability, and future extensibility.
+The component provides a simple interface for storing pages, retrieving pages by URL, checking whether a page exists, and reporting the number of stored pages.
 
 ---
 
-# Section 1 – Public API
+# Responsibilities
 
-The responsibility of the **PageStorage** component is to permanently store every successfully crawled web page so that it can later be consumed by the Indexer. The component is independent of crawling logic, duplicate detection, URL extraction, and page fetching. It only manages page persistence and retrieval.
+The PageStorage component is responsible for:
 
-## Public Interface
+* Persistently storing every crawled page.
+* Creating and maintaining the storage directory.
+* Creating and maintaining the index file.
+* Retrieving stored pages using their URL.
+* Reporting the total number of stored pages.
 
-```cpp
-class PageStorage {
-public:
-    void storePage(string url,std::string html,int depth);
+The PageStorage component is **not** responsible for:
 
-    std::string getPage(string url);
-
-    bool hasPage(string url);
-
-    int pageCount();
-};
-```
-
-## Method Descriptions
-
-### `storePage(string url, string html, int depth)`
-
-Stores a successfully crawled page into the storage file. The page is appended sequentially together with its URL and crawl depth.
-
-PageStorage assumes that duplicate URLs have already been filtered by the Seen URL Store.
+* Fetching web pages.
+* Extracting hyperlinks.
+* Duplicate detection.
+* URL validation or normalization.
+* HTML parsing.
+* Index generation.
 
 ---
 
-### `getPage(string url)`
+# Storage Architecture
 
-Searches the storage file for the specified URL and returns the complete HTML content associated with that URL.
-
-If the URL is not present, an empty string is returned.
-
----
-
-### `hasPage(string url)`
-
-Checks whether the specified page exists in storage.
-
-Internally, this method calls `getPage(url)` and returns:
-
-* `true` if HTML content is found.
-* `false` otherwise.
-
----
-
-### `pageCount()`
-
-Returns the number of successfully stored pages during the current crawl session.
-
-The count is maintained internally and therefore executes in constant time.
-
----
-
-# Section 2 – Internal Representation
-
-## Component Responsibility
-
-PageStorage is responsible only for storing and retrieving crawled pages.
-
-It **does not**
-
-* detect duplicate URLs,
-* validate URLs,
-* download web pages,
-* parse HTML,
-* extract hyperlinks.
-
-Duplicate detection is completely handled by the **Seen URL Store** before `storePage()` is invoked.
-
----
-
-## Storage Medium
-
-The current implementation stores pages inside a **single structured text file**.
-
-Reasons for choosing this approach:
-
-* Simple implementation.
-* Easy to debug.
-* Human-readable format.
-* No external dependencies.
-* Suitable for the current project requirements.
-* Easily replaceable by a database in future.
-
----
-
-## File Ownership
-
-PageStorage completely manages the storage file.
-
-Its responsibilities include:
-
-* creating the storage file,
-* clearing any previous crawl data before a new crawl begins,
-* opening and closing the file,
-* writing page records,
-* reading stored page records.
-
-The crawler never directly manipulates the storage file.
-
----
-
-## Internal Data Members
-
-```cpp
-private:
-    std::fstream storageFile;
-    std::string storageFileName;
-    int totalPages;
-```
-
-### Description
-
-* **storageFile** – File stream used for page storage.
-* **storageFileName** – Name or path of the storage file.
-* **totalPages** – Number of successfully stored pages.
-
----
-
-## Storage Format
-
-Each page is stored sequentially in the following format:
+The storage directory contains one index file and one file for every stored page.
 
 ```text
-URL
-Depth
-HTML Content
-<<<PAGE_END>>>
+storage/
+│
+├── index.txt
+│
+├── 1.page
+├── 2.page
+├── 3.page
+├── 4.page
+└── ...
+```
+
+The storage layout is persistent and remains available even after the crawler terminates.
+
+---
+
+# Design Decision
+
+The storage mechanism follows the **one-file-per-page** approach.
+
+Each page is assigned a unique numeric identifier beginning from **1**.
+
+The numeric identifier is used as the filename instead of the URL.
+
+This design avoids problems such as:
+
+* Invalid filename characters (`/`, `?`, `:`, `*`, etc.).
+* Extremely long URLs exceeding filename limits.
+* Platform-specific filesystem restrictions.
+* URL sanitization complexity.
+
+---
+
+# Index File Format
+
+The file `index.txt` stores lightweight metadata for every stored page.
+
+Each line has the following format:
+
+```text
+<FileID>|<URL>|<Depth>
 ```
 
 Example:
 
 ```text
-https://example.com
-0
-<html>
-...
-</html>
-<<<PAGE_END>>>
+1|https://books.toscrape.com|0
+2|https://books.toscrape.com/catalogue/page-2.html|1
+3|https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html|2
+```
 
-https://google.com
+The index file stores:
+
+* File Identifier
+* URL
+* Crawl Depth
+
+The HTML content is **not** stored inside the index.
+
+---
+
+# Page File Format
+
+Each page is stored inside an individual file.
+
+Example:
+
+```
+2.page
+```
+
+Contents:
+
+```text
+https://books.toscrape.com/catalogue/page-2.html
 1
+<!DOCTYPE html>
 <html>
 ...
 </html>
-<<<PAGE_END>>>
 ```
 
-The delimiter `<<<PAGE_END>>>` marks the end of one stored page.
+Every page file contains exactly three sections:
 
-### Why a Custom Delimiter?
+1. URL
+2. Crawl Depth
+3. Raw HTML Content
 
-Although many websites return complete HTML documents, some servers may return malformed or incomplete HTML that does not contain the closing `</html>` tag.
-
-Using a custom delimiter allows PageStorage to reliably identify the end of each stored page regardless of the content returned by the Fetcher.
-
----
-
-## Internal Algorithms
-
-### storePage()
-
-1. Open the storage file in append mode.
-2. Write the URL.
-3. Write the crawl depth.
-4. Write the complete HTML content.
-5. Write the page delimiter `<<<PAGE_END>>>`.
-6. Increment `totalPages`.
-7. Flush the output stream.
+This format is compatible with the project requirements.
 
 ---
 
-### getPage()
-
-1. Open the storage file.
-2. Search sequentially for the requested URL.
-3. Skip the stored depth.
-4. Read lines until `<<<PAGE_END>>>` is encountered.
-5. Return the collected HTML.
-6. Return an empty string if the URL is not found.
-
----
-
-### hasPage()
+# Class Members
 
 ```cpp
-return !getPage(url).empty();
+private:
+
+std::string storageDirectory;
+
+std::string indexFilePath;
+
+int pageCount;
 ```
+
+The component does **not** maintain a persistent file stream.
+
+Files are opened only when an operation requires them and are immediately closed afterwards.
 
 ---
 
-### pageCount()
+# Constructor
 
 ```cpp
-return totalPages;
+PageStorage(const std::string& storageDirectory);
+```
+
+The constructor performs the following tasks:
+
+1. Stores the storage directory path.
+2. Creates the storage directory if it does not already exist.
+3. Creates `index.txt` if it does not exist.
+4. Reads `index.txt`.
+5. Counts the number of stored pages.
+6. Initializes `pageCount`.
+
+After construction, the object is immediately ready for use.
+
+---
+
+# Runtime Initialization
+
+When the crawler starts, the runtime state is reconstructed from persistent storage.
+
+```
+Crawler Starts
+
+        │
+        ▼
+
+PageStorage Constructor
+
+        │
+        ▼
+
+Read index.txt
+
+        │
+        ▼
+
+Count stored entries
+
+        │
+        ▼
+
+Initialize pageCount
+
+        │
+        ▼
+
+Ready
+```
+
+Since the storage is persistent, the crawler correctly resumes with the current number of stored pages even after restarting.
+
+---
+
+# storePage()
+
+Algorithm:
+
+```
+FileID = pageCount + 1
+
+        │
+
+Create FileID.page
+
+        │
+
+Write:
+    URL
+    Depth
+    HTML
+
+        │
+
+Append
+
+FileID|URL|Depth
+
+to index.txt
+
+        │
+
+pageCount++
+```
+
+Time Complexity:
+
+```
+O(1)
 ```
 
 ---
 
-## Memory Representation
+# getPage()
 
-### PageStorage Object
+Algorithm:
 
-```text
-+--------------------------------+
-|          PageStorage           |
-+--------------------------------+
-| storageFile                    |
-| storageFileName                |
-| totalPages                     |
-+--------------------------------+
+```
+Open index.txt
+
+        │
+
+Search for matching URL
+
+        │
+
+Retrieve FileID
+
+        │
+
+Open FileID.page
+
+        │
+
+Skip URL
+
+Skip Depth
+
+        │
+
+Read HTML
+
+        │
+
+Return HTML
 ```
 
-### Storage File
+Time Complexity:
 
-```text
-+---------------------------------------------------+
-| URL                                               |
-| Depth                                             |
-| HTML                                              |
-| <<<PAGE_END>>>                                    |
-| URL                                               |
-| Depth                                             |
-| HTML                                              |
-| <<<PAGE_END>>>                                    |
-| URL                                               |
-| Depth                                             |
-| HTML                                              |
-| <<<PAGE_END>>>                                    |
-+---------------------------------------------------+
+* Best Case: **O(1)**
+* Average Case: **O(n)**
+* Worst Case: **O(n)**
+
+where **n** is the number of stored pages.
+
+---
+
+# hasPage()
+
+Algorithm:
+
+```
+Open index.txt
+
+        │
+
+Search URL sequentially
+
+        │
+
+Found?
+
+ ├── Yes → true
+ └── No  → false
 ```
 
----
+Time Complexity:
 
-# Section 3 – Failure Handling
-
-## Duplicate URLs
-
-Duplicate URL detection is **not** performed by PageStorage.
-
-The crawler verifies every discovered URL using the Seen URL Store before calling `storePage()`. Therefore, PageStorage assumes that every incoming page is unique.
+* Best Case: **O(1)**
+* Average Case: **O(n)**
+* Worst Case: **O(n)**
 
 ---
 
-## Invalid URL
+# pageCount()
 
-Invalid URLs are rejected before reaching the storage component.
-
-PageStorage performs no URL validation.
-
----
-
-## Download Failure
-
-If the Fetcher fails to retrieve a page, `storePage()` is never called.
-
----
-
-## Empty HTML
-
-If the Fetcher returns an empty HTML response, the page is still stored because it represents the actual server response.
-
----
-
-## Malformed HTML
-
-PageStorage performs no validation or correction of HTML.
-
-It stores exactly the data returned by the Fetcher.
-
----
-
-## File Errors
-
-If the storage file cannot be opened or written, the operation fails and an appropriate error is reported to the crawler.
-
----
-
-# Section 4 – Complexity Analysis
-
-| Operation     | Best | Average | Worst | Explanation                            |
-| ------------- | ---- | ------- | ----- | -------------------------------------- |
-| `storePage()` | O(1) | O(1)    | O(1)  | Sequential append operation            |
-| `getPage()`   | O(1) | O(n)    | O(n)  | Sequential search through stored pages |
-| `hasPage()`   | O(1) | O(n)    | O(n)  | Calls `getPage()` internally           |
-| `pageCount()` | O(1) | O(1)    | O(1)  | Returns maintained counter             |
-
-Where **n** represents the number of stored pages.
-
----
-
-# Section 5 – Future Compatibility
-
-The PageStorage interface is intentionally independent of the storage implementation.
-
-The crawler interacts only with the following public interface:
+The value is maintained as a member variable.
 
 ```cpp
-storePage(...)
-getPage(...)
-hasPage(...)
-pageCount(...)
+return pageCount;
 ```
 
-Currently, pages are stored in a structured text file.
+Time Complexity:
 
-In future versions of the crawler, the internal implementation can be replaced with **MongoDB** while preserving the same public interface.
+```
+O(1)
+```
+
+---
+
+# Program Termination
+
+When the crawler terminates:
+
+* All runtime variables are destroyed.
+* The operating system releases all memory.
+* The storage directory remains unchanged.
+
+Persistent files:
 
 ```text
-Current Design
-
-Crawler
-    │
-    ▼
-PageStorage
-    │
-    ▼
-Structured Text File
-
-
-Future Design
-
-Crawler
-    │
-    ▼
-PageStorage
-    │
-    ▼
-MongoDB
+storage/
+│
+├── index.txt
+├── 1.page
+├── 2.page
+├── ...
 ```
 
-Since only the internal implementation changes, the crawler does not require any modifications. This minimizes coupling between components and allows the storage mechanism to evolve without affecting the rest of the system.
+When the crawler starts again, the constructor rebuilds the runtime state by reading `index.txt`.
 
 ---
 
 # Advantages
 
-* Simple and easy to implement.
-* Human-readable storage format.
-* No external database dependency.
-* Easy to debug and inspect.
-* Supports future migration to MongoDB.
-* Clear separation of responsibilities.
+* Persistent storage across program executions.
+* One page per file simplifies inspection and debugging.
+* Numeric filenames eliminate URL-to-filename conversion issues.
+* No filename length limitations.
+* No invalid filename characters.
+* Simple storage layout.
+* Easy integration with the Indexer.
+* Runtime state is reconstructed automatically after restart.
+* Does not require any external database.
 
 ---
 
 # Limitations
 
-* Retrieval requires sequential file traversal.
-* Performance decreases as the number of stored pages grows.
-* Designed for a single-threaded crawler.
-* Not intended for very large-scale storage.
-* Does not support concurrent read/write operations.
+* `getPage()` performs sequential searching through `index.txt`.
+* `hasPage()` also performs sequential searching.
+* Retrieval performance decreases as the number of stored pages increases.
+* The current implementation assumes stored pages are never deleted.
+* The component is designed for single-threaded execution.
+
+---
+
+# Trade-off Analysis
+
+| Option                         | Advantages                                                                                  | Disadvantages                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **One File Per Page (Chosen)** | Persistent, easy to inspect, simple debugging, avoids URL filename issues using numeric IDs | URL lookup requires scanning `index.txt`                                       |
+| **Single Structured File**     | Compact storage, only one file                                                              | Parsing is more complex, random access is difficult                            |
+| **In-Memory HashMap**          | Very fast lookup                                                                            | Data is lost when the program terminates and cannot support persistent storage |
+
+The **one-file-per-page** strategy was selected because it provides persistent storage, a simple implementation, easy debugging, and naturally satisfies the project requirements while avoiding filesystem issues associated with URL-based filenames.
+
+---
+
+# Future Improvements
+
+The current design is intentionally simple and suitable for the expected project size.
+
+Possible future enhancements include:
+
+* Building an in-memory URL index during startup to achieve average **O(1)** lookups.
+* Supporting deletion of stored pages.
+* Replacing text-based storage with a database backend.
+* Supporting concurrent read and write operations.
+* Compressing stored HTML to reduce disk usage.
