@@ -67,3 +67,56 @@ bool URLNormalizer::isInvalidScheme(
            startsWith(url, "ftp:")        ||
            startsWith(url, "data:");
 }
+
+string URLNormalizer::removeFragment(const string& url){
+    string result;
+    for(int i = 0; i < url.length(); i++){
+        if(url[i] == '#'){
+            break;
+        }
+        result += url[i];
+    }
+    return result;
+}
+
+
+string URLNormalizer::removeQuery(const string& url){
+    string result;
+    for(int i = 0; i < url.length(); i++){
+        if(url[i] == '?'){
+            break;
+        }
+        result += url[i];
+    }
+    return result;
+}
+
+
+string URLNormalizer::removeTrailingSlash(const string& url){
+    if(url.empty()){
+        return url;
+    }
+    int schemeEnd = url.find("://");
+    if(schemeEnd == string::npos){
+        if(url.length() > 1 && url.back() == '/'){
+            return url.substr(0,url.length() - 1);
+        }
+
+        return url;
+    }
+    int hostStart = schemeEnd + 3;
+    int firstSlash =url.find('/', hostStart);
+    // No path
+    if(firstSlash == string::npos){
+        return url;
+    }
+    // URL is exactly https://abc.com/
+    if(firstSlash == url.length() - 1)
+    {
+        return url;
+    }
+    if(url.back() == '/'){
+        return url.substr(0,url.length() - 1);
+    }
+    return url;
+}
