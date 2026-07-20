@@ -165,3 +165,31 @@ string URLNormalizer::getDirectory(const string& baseURL){
     }
     return baseURL.substr(0,lastSlash + 1);
 }
+
+string URLNormalizer::toLowerSchemeAndHost(const string& url){
+    string result = url;
+    int schemeEnd = result.find("://");
+    if(schemeEnd == string::npos){
+        return result;
+    }
+    // Lowercase scheme
+    for(int i = 0; i < schemeEnd; i++)
+    {
+        if(result[i] >= 'A' && result[i] <= 'Z'){
+            result[i] =result[i] - 'A' + 'a';
+        }
+    }
+    int hostStart = schemeEnd + 3;
+    int hostEnd = result.find('/', hostStart);
+    if(hostEnd == string::npos){
+        hostEnd = result.length();
+    }
+
+    // Lowercase host
+    for(int i = hostStart;i < hostEnd;i++){
+        if(result[i] >= 'A' && result[i] <= 'Z'){
+            result[i] = result[i] - 'A' + 'a';
+        }
+    }
+    return result;
+}
