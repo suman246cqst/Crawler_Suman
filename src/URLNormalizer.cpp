@@ -278,3 +278,73 @@ string URLNormalizer::resolveRelativeURL(const string& baseURL,const string& rel
     return getDirectory(baseURL) + relativeURL;
 }
 
+
+
+string URLNormalizer::normalize(const string& baseURL,const string& extractedURL){
+    string url = extractedURL;
+    //--------------------------------------------------
+    // Remove surrounding spaces
+    //--------------------------------------------------
+
+    trim(url);
+
+    if(url.empty())
+    {
+        return "";
+    }
+
+    //--------------------------------------------------
+    // Ignore page fragments
+    //--------------------------------------------------
+
+    if(url[0] == '#')
+    {
+        return "";
+    }
+
+    //--------------------------------------------------
+    // Reject unsupported schemes like mailto:, etc.
+    //--------------------------------------------------
+
+    if(isInvalidScheme(url))
+    {
+        return "";
+    }
+
+    //--------------------------------------------------
+    // Remove fragment like studyadda.onrender.com/home#section
+    //--------------------------------------------------
+
+    url = removeFragment(url);
+
+    //--------------------------------------------------
+    // Remove query like google.com?q=hello
+    //--------------------------------------------------
+
+    url = removeQuery(url);
+
+    //--------------------------------------------------
+    // Absolute URL, url that starts with https or http://
+    //--------------------------------------------------
+
+    if(isAbsoluteURL(url)){
+        url = toLowerSchemeAndHost(url);
+        url = resolveDotSegments(url);
+        url = removeTrailingSlash(url);
+        return url;
+    }
+
+    //--------------------------------------------------
+    // Relative URL
+    //--------------------------------------------------
+
+    url = resolveRelativeURL(baseURL,url);
+
+    url = resolveDotSegments(url);
+
+    url = toLowerSchemeAndHost(url);
+
+    url = removeTrailingSlash(url);
+
+    return url;
+}
