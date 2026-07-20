@@ -1,0 +1,151 @@
+# Daily Design Journal
+# Module: Fetcher, Frontier and SeenStore Implementation
+**Date:** 18-07-2026
+
+---
+
+# Section 1 — Specific Bug
+
+During the implementation of the **Frontier** and **SeenStore** components, several issues were encountered while integrating them with the existing Data Structures Library.
+
+### Bug 1 — Queue Interface Mismatch
+
+The initial Queue implementation accepted elements using a non-const reference.
+
+```cpp
+void enqueue(T& value);
+```
+
+However, the Frontier frequently inserted temporary `URLDepth` objects such as
+
+```cpp
+frontier.push(URLDepth(url, depth));
+```
+
+which could not be bound to a non-const lvalue reference, resulting in compilation errors.
+
+The Queue interface was updated to
+
+```cpp
+void enqueue(const T& value);
+```
+
+allowing both temporary objects and existing variables to be inserted safely.
+
+---
+
+### Bug 2 — Invalid Return from Queue
+
+While implementing the Queue, the dequeue operation initially returned data that could become invalid after removing the corresponding node from the linked list.
+
+This produced incorrect behaviour and had the potential to return references to destroyed objects.
+
+The dequeue implementation was modified to copy the value before removing the node from the underlying LinkedList.
+
+---
+
+### Bug 3 — URLDepth Comparison
+
+Initially there was no comparison operator available for the `URLDepth` structure.
+
+This prevented queue operations and future duplicate checking logic from comparing stored objects correctly.
+
+An equality operator was added for the structure to support object comparison whenever required.
+
+---
+
+### Bug 4 — HashMap Integration
+
+While implementing SeenStore, linker errors occurred because the `HashMap<string, bool>` depended on the `HashFunction` implementation for string keys.
+
+The project failed during linking until the required hash function implementation became available to the build.
+
+---
+
+# Section 2 — Failed Attempt
+
+Initially I designed the Queue interface using non-const references because most of my earlier Data Structure operations inserted existing variables.
+
+When the Frontier was implemented, I realized that crawler code frequently creates temporary `URLDepth` objects while inserting URLs into the queue. The previous Queue interface could not accept temporary objects, causing compilation failures.
+
+Another unsuccessful attempt involved directly removing queue elements before preserving their values. Since node destruction immediately invalidated the stored object, returning it afterwards was unsafe. Copying the element before deletion resolved the issue.
+
+During SeenStore development, I initially assumed the existing HashMap implementation could be used directly without additional modifications. However, integration exposed missing dependencies in the hashing mechanism for string keys, requiring changes to the supporting Data Structures Library before SeenStore could function correctly.
+
+These issues highlighted that although the individual data structures had already been implemented, integrating them into a real application revealed several interface and design problems that were not visible during isolated unit testing.
+
+---
+
+# Section 3 — Memory Diagram
+
+**Frontier storing URLDepth objects**
+
+```
+                 Frontier
+
+              +-----------+
+              |   Queue   |
+              +-----------+
+                    |
+                    v
+
+Front
+  |
+  v
++---------------------------------------------------------+
+| URLDepth | URLDepth | URLDepth | URLDepth | URLDepth    |
++---------------------------------------------------------+
+                                                  ^
+                                                  |
+                                                Rear
+
+Each URLDepth Object
+
++--------------------------------------+
+| url   = "https://example.com"        |
+| depth = 2                            |
++--------------------------------------+
+```
+
+---
+
+# Section 4 — Code Reference
+
+**Commit:** `67efb97`
+
+* Implemented Fetcher for static and server-side rendered websites 
+
+**Commit:** `67efb97`
+
+* Implemented Frontier using Queue data structure which is also implemented in DS_Library
+
+**Commit:** `67efb97`
+
+*
+
+**Files Modified**
+
+- `src/Frontier.cpp`
+- `include/Frontier.h`
+- `src/SeenStore.cpp`
+- `include/SeenStore.h`
+
+**Supporting Data Structure Files Updated**
+
+- `Queue`
+  - Updated `enqueue()` to accept `const T&`.
+  - Corrected `dequeue()` implementation to safely return removed elements.
+- `HashFunction`
+  - Added support required by `HashMap<string, bool>` for SeenStore.
+
+---
+
+# Section 5 — Learning Reflection
+
+While implementing the Data Structures Library, my primary focus was ensuring that each data structure worked correctly in isolation. Integrating those same data structures into the crawler project demonstrated that a reusable library requires more than correct algorithms—it also requires interfaces that accommodate real application usage.
+
+The Frontier implementation revealed that accepting only non-const references unnecessarily restricted how objects could be inserted into the Queue. Supporting temporary objects through const references made the interface significantly more flexible without affecting correctness.
+
+The SeenStore implementation reinforced the importance of designing supporting components, such as hashing functions, alongside the primary data structures. Although the HashMap itself had already been implemented, integrating it into a practical application exposed missing dependencies and assumptions that were not apparent during standalone testing.
+
+This implementation phase improved my understanding of designing reusable software components. I learned that integration often exposes interface weaknesses that isolated testing cannot reveal, making application-level development an essential part of validating a library's design.
