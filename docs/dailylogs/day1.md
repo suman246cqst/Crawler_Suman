@@ -119,9 +119,9 @@ Each URLDepth Object
 
 * Implemented Frontier using Queue data structure which is also implemented in DS_Library
 
-**Commit:** `67efb97`
+**Commit:** `082d85b`
 
-*
+* Implemented SeenStore using HashMap data structure
 
 **Files Modified**
 
