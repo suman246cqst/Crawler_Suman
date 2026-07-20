@@ -29,3 +29,16 @@ bool LinkExtractor::startsWith(const string& html,int index,const string& word){
     }
     return true;
 }
+
+
+bool LinkExtractor::isAnchorTag(const string& html,int index){
+    if(index + 2 >= html.length()){
+        return false;
+    }
+    if(html[index] != '<' ||html[index + 1] != 'a'){
+        return false;
+    }
+    // After <a there must be whitespace or >
+    char next = html[index + 2];
+    return isWhiteSpace(next) || next == '>';
+}
