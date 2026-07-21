@@ -34,12 +34,10 @@ bool URLNormalizer::startsWith(const string& str,const string& prefix){
 
     for(int i = 0; i < prefix.length(); i++)
     {
-        if(str[i] != prefix[i])
-        {
+        if(tolower(str[i]) != tolower(prefix[i])){
             return false;
         }
     }
-
     return true;
 }
 
@@ -113,7 +111,7 @@ string URLNormalizer::removeTrailingSlash(const string& url){
     // URL is exactly https://abc.com/
     if(firstSlash == url.length() - 1)
     {
-        return url;
+        return url.substr(0,url.length()-1);
     }
     if(url.back() == '/'){
         return url.substr(0,url.length() - 1);
@@ -121,13 +119,11 @@ string URLNormalizer::removeTrailingSlash(const string& url){
     return url;
 }
 
-string URLNormalizer::getScheme(const string& url)
-{
+string URLNormalizer::getScheme(const string& url){
     int schemeEnd = url.find("://");
     if(schemeEnd == string::npos){
         return "";
     }
-
     return url.substr(0,schemeEnd + 3);
 }
 
