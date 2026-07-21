@@ -232,14 +232,12 @@ while preserving the original path.
 
 # Section 3 — Memory Diagram
 
-Memory diagrams prepared today include:
-
-- PageStorage persistent storage workflow.
 - LinkExtractor complete HTML traversal.
-- URLNormalizer complete normalization workflow.
-- Relative URL resolution workflow.
-- Dot-segment (`.` and `..`) resolution workflow.
 
+![LinkExtractor Workflow](../images/LinkExtractorWorkflow.png)
+- URLNormalizer complete normalization workflow.
+
+![URL Normalizer Workflow](../images/URLNormalizerWorkflow.png)
 (Hand-drawn diagrams submitted separately.)
 
 ---

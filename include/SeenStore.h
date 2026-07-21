@@ -11,4 +11,4 @@ public:
     void clear();
     int count();
 };
-#include "../src/SeenStore.cpp"
+#endif

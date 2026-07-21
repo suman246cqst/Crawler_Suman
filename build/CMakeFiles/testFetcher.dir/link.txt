@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/testFetcher.dir/link.d CMakeFiles/testFetcher.dir/main.cpp.o -o testFetcher  libfetcher.a /usr/lib/x86_64-linux-gnu/libcurl.so /usr/lib/x86_64-linux-gnu/libcurl.so

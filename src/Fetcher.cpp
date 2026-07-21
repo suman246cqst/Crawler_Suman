@@ -21,26 +21,18 @@ Fetcher::~Fetcher()
     curl_global_cleanup();
 }
 
-size_t Fetcher::writeCallback(
-        void* contents,
-        size_t size,
-        size_t nmemb,
-        void* userData)
+size_t Fetcher::writeCallback(void* contents,size_t size,size_t nmemb,void* userData)
 {
     size_t totalBytes = size * nmemb;
 
-    std::string* html =
-        static_cast<std::string*>(userData);
+    std::string* html =static_cast<std::string*>(userData);
 
-    html->append(
-        static_cast<char*>(contents),
-        totalBytes);
+    html->append(static_cast<char*>(contents),totalBytes);
 
     return totalBytes;
 }
 
-FetchResult Fetcher::fetch(
-        const std::string& url)
+FetchResult Fetcher::fetch(const std::string& url)
 {
     FetchResult result;
 
@@ -50,9 +42,7 @@ FetchResult Fetcher::fetch(
 
     if(curl == nullptr)
     {
-        result.errorMessage =
-            "Unable to initialize CURL.";
-
+        result.errorMessage ="Unable to initialize CURL.";
         return result;
     }
 
@@ -98,8 +88,7 @@ FetchResult Fetcher::fetch(
 
     if(code != CURLE_OK)
     {
-        result.errorMessage =
-            curl_easy_strerror(code);
+        result.errorMessage = curl_easy_strerror(code);
 
         curl_easy_cleanup(curl);
 

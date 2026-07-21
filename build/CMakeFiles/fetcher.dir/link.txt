@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfetcher.a CMakeFiles/fetcher.dir/src/Fetcher.cpp.o CMakeFiles/fetcher.dir/src/Frontier.cpp.o CMakeFiles/fetcher.dir/src/SeenStore.cpp.o CMakeFiles/fetcher.dir/src/PageStorage.cpp.o CMakeFiles/fetcher.dir/src/LinkExtractor.cpp.o CMakeFiles/fetcher.dir/src/URLNormalizer.cpp.o CMakeFiles/fetcher.dir/src/crawler.cpp.o CMakeFiles/fetcher.dir/mnt/c/Users/suman/Desktop/DS_Library/src/HashFunction.cpp.o
+/usr/bin/ranlib libfetcher.a

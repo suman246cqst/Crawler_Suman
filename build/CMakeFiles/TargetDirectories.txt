@@ -1,0 +1,4 @@
+/mnt/c/Users/suman/Desktop/Crawler/build/CMakeFiles/fetcher.dir
+/mnt/c/Users/suman/Desktop/Crawler/build/CMakeFiles/testFetcher.dir
+/mnt/c/Users/suman/Desktop/Crawler/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/suman/Desktop/Crawler/build/CMakeFiles/rebuild_cache.dir

@@ -23,5 +23,4 @@ public:
     bool empty();
     int size();
 };
-#include "../src/Frontier.cpp"
 #endif
