@@ -1,5 +1,5 @@
 #include "LinkExtractor.h"
-
+#include <string>
 bool LinkExtractor::isWhiteSpace(char ch){
     return ch == ' ' ||
            ch == '\t' ||
@@ -23,7 +23,7 @@ bool LinkExtractor::startsWith(const string& html,int index,const string& word){
     }
 
     for(int i = 0; i < word.length(); i++){
-        if(html[index + i] != word[i]){
+        if(tolower(html[index + i]) != tolower(word[i])){
             return false;
         }
     }
@@ -35,7 +35,7 @@ bool LinkExtractor::isAnchorTag(const string& html,int index){
     if(index + 2 >= html.length()){
         return false;
     }
-    if(html[index] != '<' ||html[index + 1] != 'a'){
+    if(html[index] != '<' ||tolower(html[index + 1]) != 'a'){
         return false;
     }
     // After <a there must be whitespace or >
