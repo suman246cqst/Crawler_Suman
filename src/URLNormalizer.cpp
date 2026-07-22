@@ -274,7 +274,12 @@ string URLNormalizer::resolveRelativeURL(const string& baseURL,const string& rel
     return getDirectory(baseURL) + relativeURL;
 }
 
-
+string URLNormalizer::ensureScheme(const string& url){
+    if (isAbsoluteURL(url)){
+        return url;
+    }
+    return "http://" + url;
+}
 
 string URLNormalizer::normalize(const string& baseURL,const string& extractedURL){
     string url = extractedURL;
@@ -340,6 +345,34 @@ string URLNormalizer::normalize(const string& baseURL,const string& extractedURL
 
     url = toLowerSchemeAndHost(url);
 
+    url = removeTrailingSlash(url);
+
+    return url;
+}
+
+string URLNormalizer::normalize(const string& extractedURL)
+{
+    string url = extractedURL;
+
+    trim(url);
+
+    if (url.empty())
+        return "";
+
+    if (url[0] == '#')
+        return "";
+
+    if (isInvalidScheme(url))
+        return "";
+
+    url = removeFragment(url);
+    url = removeQuery(url);
+
+    // Ensure the URL is absolute
+    url = ensureScheme(url);
+
+    url = toLowerSchemeAndHost(url);
+    url = resolveDotSegments(url);
     url = removeTrailingSlash(url);
 
     return url;

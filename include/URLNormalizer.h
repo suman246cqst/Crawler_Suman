@@ -36,10 +36,11 @@ private:
     string getDirectory(const string& baseURL);
 
     string resolveRelativeURL(const string& baseURL,const string& relativeURL);
-
+    string ensureScheme(const string& url);
     string resolveDotSegments(const string& url);
 
 public:
+    string normalize(const string& extractedURL);
     string normalize(const string& baseURL,const string& extractedURL);
 };
 
