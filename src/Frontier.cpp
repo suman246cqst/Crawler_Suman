@@ -3,7 +3,7 @@
 #include<string>
 using namespace std;
 URLDepth::URLDepth(const string& url, int depth):url(url),depth(depth){}
-bool URLDepth::operator==(const URLDepth& other){
+bool URLDepth::operator==(const URLDepth& other) const{
     return url==other.url;
 }
 void Frontier::push(const URLDepth& item){

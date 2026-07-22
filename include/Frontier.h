@@ -10,7 +10,7 @@ public:
     string url;
     int depth;
     URLDepth(const string& url, int depth);
-    bool operator==(const URLDepth& other);
+    bool operator==(const URLDepth& other) const;
 };
 
 class Frontier{
