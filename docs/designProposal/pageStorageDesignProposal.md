@@ -316,7 +316,7 @@ Time Complexity:
 
 ---
 
-# pageCount()
+# getPageCount()
 
 The value is maintained as a member variable.
 

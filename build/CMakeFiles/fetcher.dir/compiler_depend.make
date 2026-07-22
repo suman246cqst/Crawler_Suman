@@ -791,7 +791,19 @@ CMakeFiles/fetcher.dir/src/LinkExtractor.cpp.o: /mnt/c/Users/suman/Desktop/Crawl
   /usr/lib/gcc/x86_64-linux-gnu/15/include/stddef.h
 
 CMakeFiles/fetcher.dir/src/PageStorage.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/src/PageStorage.cpp \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/dynamicArray.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/hashMap.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/linkedList.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/src/dynamicArray.cpp \
+  /mnt/c/Users/suman/Desktop/DS_Library/src/hashMap.cpp \
+  /mnt/c/Users/suman/Desktop/DS_Library/src/linkedList.cpp \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/HashFunction.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/dynamicArray.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/hashMap.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/hashmap.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/linkedList.h \
   /mnt/c/Users/suman/Desktop/Crawler/include/PageStorage.h \
+  /mnt/c/Users/suman/Desktop/Crawler/include/SeenStore.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
@@ -910,6 +922,7 @@ CMakeFiles/fetcher.dir/src/PageStorage.cpp.o: /mnt/c/Users/suman/Desktop/Crawler
   /usr/include/c++/15/iomanip \
   /usr/include/c++/15/ios \
   /usr/include/c++/15/iosfwd \
+  /usr/include/c++/15/iostream \
   /usr/include/c++/15/istream \
   /usr/include/c++/15/limits \
   /usr/include/c++/15/locale \
@@ -1060,7 +1073,9 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/asm-generic/types.h \
   /usr/include/c++/15/backward/binders.h \
   /usr/include/c++/15/bit \
+  /usr/include/c++/15/bits/align.h \
   /usr/include/c++/15/bits/alloc_traits.h \
+  /usr/include/c++/15/bits/allocated_ptr.h \
   /usr/include/c++/15/bits/allocator.h \
   /usr/include/c++/15/bits/basic_ios.h \
   /usr/include/c++/15/bits/basic_ios.tcc \
@@ -1068,6 +1083,7 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/bits/basic_string.tcc \
   /usr/include/c++/15/bits/char_traits.h \
   /usr/include/c++/15/bits/charconv.h \
+  /usr/include/c++/15/bits/chrono.h \
   /usr/include/c++/15/bits/codecvt.h \
   /usr/include/c++/15/bits/concept_check.h \
   /usr/include/c++/15/bits/cpp_type_traits.h \
@@ -1076,6 +1092,11 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/bits/exception.h \
   /usr/include/c++/15/bits/exception_defines.h \
   /usr/include/c++/15/bits/exception_ptr.h \
+  /usr/include/c++/15/bits/fs_dir.h \
+  /usr/include/c++/15/bits/fs_fwd.h \
+  /usr/include/c++/15/bits/fs_ops.h \
+  /usr/include/c++/15/bits/fs_path.h \
+  /usr/include/c++/15/bits/fstream.tcc \
   /usr/include/c++/15/bits/functexcept.h \
   /usr/include/c++/15/bits/functional_hash.h \
   /usr/include/c++/15/bits/hash_bytes.h \
@@ -1100,6 +1121,7 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/bits/ostream.h \
   /usr/include/c++/15/bits/ostream.tcc \
   /usr/include/c++/15/bits/ostream_insert.h \
+  /usr/include/c++/15/bits/parse_numbers.h \
   /usr/include/c++/15/bits/postypes.h \
   /usr/include/c++/15/bits/predefined_ops.h \
   /usr/include/c++/15/bits/ptr_traits.h \
@@ -1110,6 +1132,8 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/bits/ranges_util.h \
   /usr/include/c++/15/bits/refwrap.h \
   /usr/include/c++/15/bits/requires_hosted.h \
+  /usr/include/c++/15/bits/shared_ptr.h \
+  /usr/include/c++/15/bits/shared_ptr_base.h \
   /usr/include/c++/15/bits/sstream.tcc \
   /usr/include/c++/15/bits/std_abs.h \
   /usr/include/c++/15/bits/stl_algobase.h \
@@ -1119,10 +1143,12 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/15/bits/stl_iterator_base_types.h \
   /usr/include/c++/15/bits/stl_pair.h \
+  /usr/include/c++/15/bits/stl_uninitialized.h \
   /usr/include/c++/15/bits/streambuf.tcc \
   /usr/include/c++/15/bits/streambuf_iterator.h \
   /usr/include/c++/15/bits/string_view.tcc \
   /usr/include/c++/15/bits/stringfwd.h \
+  /usr/include/c++/15/bits/unique_ptr.h \
   /usr/include/c++/15/bits/uses_allocator.h \
   /usr/include/c++/15/bits/uses_allocator_args.h \
   /usr/include/c++/15/bits/utility.h \
@@ -1130,6 +1156,7 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/cctype \
   /usr/include/c++/15/cerrno \
   /usr/include/c++/15/clocale \
+  /usr/include/c++/15/codecvt \
   /usr/include/c++/15/compare \
   /usr/include/c++/15/concepts \
   /usr/include/c++/15/cstddef \
@@ -1142,22 +1169,28 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/c++/15/debug/assertions.h \
   /usr/include/c++/15/debug/debug.h \
   /usr/include/c++/15/exception \
+  /usr/include/c++/15/ext/aligned_buffer.h \
   /usr/include/c++/15/ext/alloc_traits.h \
   /usr/include/c++/15/ext/atomicity.h \
+  /usr/include/c++/15/ext/concurrence.h \
   /usr/include/c++/15/ext/numeric_traits.h \
   /usr/include/c++/15/ext/string_conversions.h \
   /usr/include/c++/15/ext/type_traits.h \
+  /usr/include/c++/15/filesystem \
+  /usr/include/c++/15/fstream \
   /usr/include/c++/15/initializer_list \
   /usr/include/c++/15/iomanip \
   /usr/include/c++/15/ios \
   /usr/include/c++/15/iosfwd \
   /usr/include/c++/15/iostream \
   /usr/include/c++/15/istream \
+  /usr/include/c++/15/limits \
   /usr/include/c++/15/locale \
   /usr/include/c++/15/new \
   /usr/include/c++/15/numbers \
   /usr/include/c++/15/ostream \
   /usr/include/c++/15/pstl/pstl_config.h \
+  /usr/include/c++/15/ratio \
   /usr/include/c++/15/sstream \
   /usr/include/c++/15/stdexcept \
   /usr/include/c++/15/streambuf \
@@ -1255,8 +1288,10 @@ CMakeFiles/fetcher.dir/src/SeenStore.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/s
   /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
   /usr/include/x86_64-linux-gnu/bits/wordsize.h \
   /usr/include/x86_64-linux-gnu/c++/15/bits/atomic_word.h \
+  /usr/include/x86_64-linux-gnu/c++/15/bits/basic_file.h \
   /usr/include/x86_64-linux-gnu/c++/15/bits/c++allocator.h \
   /usr/include/x86_64-linux-gnu/c++/15/bits/c++config.h \
+  /usr/include/x86_64-linux-gnu/c++/15/bits/c++io.h \
   /usr/include/x86_64-linux-gnu/c++/15/bits/c++locale.h \
   /usr/include/x86_64-linux-gnu/c++/15/bits/cpu_defines.h \
   /usr/include/x86_64-linux-gnu/c++/15/bits/ctype_base.h \
@@ -1502,6 +1537,7 @@ CMakeFiles/fetcher.dir/src/crawler.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/src
   /mnt/c/Users/suman/Desktop/DS_Library/include/HashFunction.h \
   /mnt/c/Users/suman/Desktop/DS_Library/include/LinkedList.h \
   /mnt/c/Users/suman/Desktop/DS_Library/include/dynamicArray.h \
+  /mnt/c/Users/suman/Desktop/DS_Library/include/hashMap.h \
   /mnt/c/Users/suman/Desktop/DS_Library/include/hashmap.h \
   /mnt/c/Users/suman/Desktop/DS_Library/include/linkedList.h \
   /mnt/c/Users/suman/Desktop/DS_Library/include/queue.h \
@@ -1774,10 +1810,6 @@ CMakeFiles/fetcher.dir/src/crawler.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/src
 
 /mnt/c/Users/suman/Desktop/Crawler/include/URLNormalizer.h:
 
-/mnt/c/Users/suman/Desktop/Crawler/include/SeenStore.h:
-
-/mnt/c/Users/suman/Desktop/DS_Library/src/hashMap.cpp:
-
 /mnt/c/Users/suman/Desktop/Crawler/src/SeenStore.cpp:
 
 /usr/include/x86_64-linux-gnu/c++/15/bits/c++io.h:
@@ -1810,7 +1842,11 @@ CMakeFiles/fetcher.dir/src/crawler.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/src
 
 /usr/include/c++/15/bits/align.h:
 
+/mnt/c/Users/suman/Desktop/Crawler/include/SeenStore.h:
+
 /mnt/c/Users/suman/Desktop/Crawler/include/PageStorage.h:
+
+/mnt/c/Users/suman/Desktop/DS_Library/src/hashMap.cpp:
 
 /mnt/c/Users/suman/Desktop/Crawler/src/PageStorage.cpp:
 
@@ -2164,9 +2200,9 @@ CMakeFiles/fetcher.dir/src/crawler.cpp.o: /mnt/c/Users/suman/Desktop/Crawler/src
 
 /usr/include/c++/15/bits/stl_iterator_base_types.h:
 
-/mnt/c/Users/suman/Desktop/DS_Library/include/hashMap.h:
-
 /usr/include/c++/15/bits/fstream.tcc:
+
+/mnt/c/Users/suman/Desktop/DS_Library/include/hashMap.h:
 
 /usr/include/c++/15/bits/memoryfwd.h:
 
