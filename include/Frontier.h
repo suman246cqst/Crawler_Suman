@@ -1,26 +1,40 @@
 #ifndef FRONTIER_H
 #define FRONTIER_H
-#include<iostream>
-#include<string>
-#include "../../DS_Library/include/queue.h"
 
-using namespace std;
-class URLDepth{
+#include <string>
+
+#include "../../DS_Library/include/Queue.h"
+#include "../../DS_Library/include/HashMap.h"
+
+class URLDepth
+{
 public:
-    string url;
+    std::string url;
     int depth;
-    URLDepth(const string& url, int depth);
+
+    URLDepth(const std::string& url, int depth);
+
     bool operator==(const URLDepth& other) const;
 };
 
-class Frontier{
+class Frontier
+{
 private:
-    Queue<URLDepth> queue;
+    Queue<URLDepth> pendingQueue;
+    HashMap<string, bool> pendingURLs;
+
 public:
-    void push(const URLDepth& item);
+    void push(URLDepth& item);
+
     URLDepth pop();
-    const URLDepth& front();
-    bool empty();
-    int size();
+
+    const URLDepth& front() ;
+
+    bool contains(std::string& url) ;
+
+    bool empty() const;
+
+    int size() const;
 };
+
 #endif

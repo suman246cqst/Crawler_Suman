@@ -1,23 +1,39 @@
-#include<iostream>
 #include "../include/Frontier.h"
-#include<string>
-using namespace std;
-URLDepth::URLDepth(const string& url, int depth):url(url),depth(depth){}
+
+URLDepth::URLDepth(const std::string& url, int depth) : url(url), depth(depth){}
+
 bool URLDepth::operator==(const URLDepth& other) const{
-    return url==other.url;
+    return url == other.url;
 }
-void Frontier::push(const URLDepth& item){
-    queue.enqueue(item);
+
+void Frontier::push(URLDepth& item){
+    if(pendingURLs.exists(item.url)){
+        return;
+    }
+    pendingQueue.enqueue(item);
+    bool visited=true;
+    pendingURLs.insert(item.url, visited);
 }
+
 URLDepth Frontier::pop(){
-    return queue.dequeue();
+    URLDepth item = pendingQueue.dequeue();
+    pendingURLs.remove(item.url);
+    return item;
 }
-bool Frontier::empty(){
-    return queue.isEmpty();
+
+const URLDepth& Frontier::front() {
+    return pendingQueue.peek();
 }
-const URLDepth& Frontier::front(){
-    return queue.peek();
+
+bool Frontier::contains(string& url){
+    return pendingURLs.exists(url);
 }
-int Frontier::size(){
-    return queue.size();
+
+bool Frontier::empty() const{
+    return pendingQueue.isEmpty();
 }
+
+int Frontier::size() const{
+    return pendingQueue.size();
+}
+
