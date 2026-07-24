@@ -1,146 +1,161 @@
-#include "PageStorage.h"
-#include "SeenStore.h"
+#include "../include/PageStorage.h"
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 
-namespace fs = filesystem;
+using namespace std;
+namespace fs = std::filesystem;
 
-PageStorage::PageStorage(){
-    storageDirectory = "../CrawlerStorage";
-    indexFilePath = storageDirectory + "/index.txt";
+PageStorage::PageStorage(): storageDirectory("../CrawlerStorage"){
     createStorageDirectory();
-    createIndexFile();
-    initializeStorage();
+    database.open(buildFilePath("crawler.db"));
+    database.createURLTable();
 }
-void PageStorage::initializeStorage(){
-    ifstream indexFile(indexFilePath);
-    if (!indexFile){
-        return;
-    }
-    string line;
-    totalPages = 0;
 
-    while (getline(indexFile, line))
+void PageStorage::createStorageDirectory()
+{
+    if(!fs::exists(storageDirectory))
     {
-        if (line.empty())
-        {
-            continue;
-        }
-
-        stringstream ss(line);
-
-        string idString;
-        string url;
-        string depthString;
-
-        getline(ss, idString, '|');
-        getline(ss, url, '|');
-        getline(ss, depthString);
-        int id = stoi(idString);
-        int depth = stoi(depthString);
-
-        PageInfo info;
-        info.id = id;
-        info.depth = depth;
-        pageIndex.insert(url, info);
-        idToURL.insert(id, url);
-
-        totalPages++;
-    }
-
-    indexFile.close();
-}
-void PageStorage::createStorageDirectory(){
-    if (!fs::exists(storageDirectory)){
         fs::create_directories(storageDirectory);
     }
 }
 
-void PageStorage::createIndexFile(){
-    if (!fs::exists(indexFilePath)){
-        ofstream file(indexFilePath);
-        file.close();
-    }
+string PageStorage::buildFilePath(
+    const string& fileName) const
+{
+    return storageDirectory + "/" + fileName;
 }
 
+void PageStorage::recoverCrawlerState(
+    Frontier& frontier,
+    SeenStore& seenStore)
+{
+    DynamicArray<URLDepth> pendingURLs =
+        database.loadPendingURLs();
 
-void PageStorage::storePage(string& url,string& html,int depth){
-    int fileID = totalPages + 1;
-    string pageFilePath =storageDirectory + "/" +to_string(fileID) + ".page";
-    ofstream pageFile(pageFilePath);
-    if (!pageFile){
-        return;
-    }
-    pageFile << url << '\n';
-    pageFile << depth << '\n';
-    pageFile << html;
-    pageFile.close();
-
-    ofstream indexFile(indexFilePath, ios::app);
-    if (!indexFile){
-        return;
-    }
-
-    indexFile
-        << fileID
-        << "|"
-        << url
-        << "|"
-        << depth
-        << '\n';
-
-    indexFile.close();
-    PageInfo info;
-    info.id = fileID;
-    info.depth = depth;
-    pageIndex.insert(url, info);
-    idToURL.insert(fileID, url);
-    totalPages++;
-}
-
-bool PageStorage::hasPage(string& url){
-    return pageIndex.exists(url);
-}
-
-string PageStorage::getPage(string& url){
-    if(!pageIndex.exists(url)){
-        return "";
-    }
-    PageInfo storedPage=pageIndex.get(url);
-    string pageFilePath =storageDirectory + "/" +to_string(storedPage.id)+".page";
-
-    ifstream pageFile(pageFilePath);
-    if (!pageFile){
-        return "";
-    }
-    string storedURL;
-    string storedDepth;
-    getline(pageFile, storedURL);
-    getline(pageFile, storedDepth);
-
-    string html;
-    string temp;
-
-    while (getline(pageFile, temp))
+    for(int i = 0; i < pendingURLs.getSize(); i++)
     {
-        html += temp;
-
-        if (!pageFile.eof())
-        {
-            html += '\n';
-        }
+        frontier.push(pendingURLs[i]);
     }
-    pageFile.close();
-    return html;
+
+    DynamicArray<string> completedURLs =
+        database.loadCompletedURLs();
+
+    for(int i = 0; i < completedURLs.getSize(); i++)
+    {
+        seenStore.insert(completedURLs[i]);
+    }
 }
 
-string PageStorage::getURLByID(int id){
-    if(!idToURL.exists(id)){
+bool PageStorage::addPendingURL(const string& url,int depth)
+{
+    return database.insertPendingURL(
+        url,
+        depth
+    );
+}
+
+bool PageStorage::storePage(
+    const string& url,
+    const string& html,
+    int depth)
+{
+    int fileId =
+        database.getNextFileId();
+
+    if(fileId == -1)
+    {
+        return false;
+    }
+
+    string fileName =
+        to_string(fileId) + ".page";
+
+    ofstream pageFile(
+        buildFilePath(fileName));
+
+    if(!pageFile)
+    {
+        return false;
+    }
+
+    // Line 1 : URL
+    pageFile << url << '\n';
+
+    // Line 2 : Depth
+    pageFile << depth << '\n';
+
+    // Line 3 onwards : Raw HTML
+    pageFile << html;
+
+    pageFile.close();
+
+    if(!database.markPageStored(
+            url,
+            fileId,
+            fileName))
+    {
+        fs::remove(
+            buildFilePath(fileName));
+
+        return false;
+    }
+
+    return true;
+}
+
+string PageStorage::getPage(
+    const string& url)
+{
+    string fileName =
+        database.getFileName(url);
+
+    if(fileName.empty())
+    {
         return "";
     }
-    return idToURL.get(id);
+
+    ifstream pageFile(
+        buildFilePath(fileName));
+
+    if(!pageFile)
+    {
+        return "";
+    }
+
+    string line;
+
+    // Skip URL
+    getline(pageFile, line);
+
+    // Skip Depth
+    getline(pageFile, line);
+
+    stringstream buffer;
+    buffer << pageFile.rdbuf();
+
+    return buffer.str();
 }
-int PageStorage::getPageCount() const{
-    return totalPages;
+
+bool PageStorage::hasPage(
+    const string& url)
+{
+    string fileName =
+        database.getFileName(url);
+
+    return !fileName.empty() &&
+           fs::exists(
+               buildFilePath(fileName));
+}
+
+int PageStorage::pageCount()
+{
+    return database.getStoredPageCount();
+}
+
+string PageStorage::getURLByID(
+    int id)
+{
+    return database.getURLByID(id);
 }
