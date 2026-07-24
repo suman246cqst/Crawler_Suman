@@ -1,36 +1,59 @@
 #ifndef PAGE_STORAGE_H
 #define PAGE_STORAGE_H
-#include "../../DS_Library/include/hashMap.h"
-#include "SeenStore.h"
+
 #include <string>
+#include "Database.h"
+#include "frontier.h"
+#include "SeenStore.h"
 
 using namespace std;
-class PageInfo{
-public:
-    int id;
-    int depth;
-};
 
 class PageStorage
 {
 private:
     string storageDirectory;
-    string indexFilePath;
-    int totalPages;
-    HashMap<string, PageInfo> pageIndex;
-    HashMap<int, string> idToURL;
+    Database database;
+
 private:
     void createStorageDirectory();
-    void createIndexFile();
-    
+    string buildFilePath(const string& fileName) const;
+
 public:
+    // Constructor
     PageStorage();
-    void initializeStorage();
-    void storePage(string& url,string& html,int depth);
-    string getPage(string& url);
-    bool hasPage(string& url);
-    int getPageCount() const;
+
+    // ==============================
+    // Crawler APIs
+    // ==============================
+
+    // Restores crawler state from persistent storage
+    void recoverCrawlerState(Frontier& frontier,
+                             SeenStore& seenStore);
+
+    // Stores a newly discovered URL in the persistent frontier
+    bool addPendingURL(const string& url,
+                       int depth);
+
+    // Stores the crawled page and updates persistent state
+    bool storePage(const string& url,
+                   const string& html,
+                   int depth);
+
+    // ==============================
+    // Indexer APIs
+    // ==============================
+
+    // Returns the total number of stored pages
+    int pageCount();
+
+    // Returns the URL corresponding to a page ID
     string getURLByID(int id);
+
+    // Returns the HTML of the specified URL
+    string getPage(const string& url);
+
+    // Checks whether the page already exists
+    bool hasPage(const string& url);
 };
 
 #endif
